@@ -1,4 +1,4 @@
-const offset = new Date().getTimezoneOffset();
+const offset = new Date().getTimezoneOffset() * 60 * 1000;
 const planetOfDays = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 
 const hourSequenceOfDay = {
@@ -26,12 +26,13 @@ async function getAllAsyncStuff(date) {
   const city = await getCity(lat, lng);
   fieldCity.innerHTML = city;
 
-  const planet = await calculatePlanetOfDay(date);
+  const planet = calculatePlanetOfDay(date);
   fieldPlanet.innerHTML = planet;
 
   const [sunRise, sunSet, sunRiseNext] = await getSunHours(lat, lng, date);
-  console.log("teste", sunRise, sunSet, sunRiseNext); ////////////teste
-  await calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
+  const [dayHourDuration, nightHourDuration] = calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
+
+  console.log(dayHourDuration, nightHourDuration);
 } //end of async stuff
 
 // functions definitions
@@ -74,20 +75,23 @@ async function getCity(lat, lng) {
 }
 
 async function getSunHours(lat, lng, date) {
+  let sunRise, sunSet, sunRiseNext;
   let dateObjNext = new Date();
   dateObjNext.setDate(date.getDate() + 1);
-  const dateStrNext = dateObjToStr(dateObjNext);
-  let dateUrl = dateObjToStr(date);
-  url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${dateUrl}&formatted=0`;
-  const response = await fetch(url);
-  const sunData = await response.json();
-  const sunRise = sunData.results.sunrise;
-  const sunSet = sunData.results.sunset;
+  dateAndNext = [dateObjToStr(date), dateObjToStr(dateObjNext)];
 
-  dateUrl = dateStrNext;
-  const responseNext = await fetch(url);
-  const sunDataNext = await responseNext.json();
-  const sunRiseNext = sunDataNext.results.sunrise;
+  for (let day = 0; day < 2; day++) {
+    let dateUrl = dateAndNext[day];
+    let url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${dateUrl}&formatted=0`;
+    const response = await fetch(url);
+    const sunData = await response.json();
+    if (day == 1) {
+      sunRiseNext = Date.parse(sunData.results.sunrise);
+    } else {
+      sunRise = Date.parse(sunData.results.sunrise);
+      sunSet = Date.parse(sunData.results.sunset);
+    }
+  }
 
   return [sunRise, sunSet, sunRiseNext];
 }
@@ -99,20 +103,24 @@ function calculatePlanetOfDay(date) {
 }
 
 function calculateHoursOfDay(sunRise, sunSet, sunRiseNext) {
-  // const hourSequence = hourSequenceOfDay[planetOfDay[dayOfWeek]];
-  // for (let hour = 0; hour < 24; hour++) {
-  //   let index = hour % 7;
-  //   if (hour < 6) {
-  //     console.log("tabela 1", hour + 1, hourSequence[index]);
-  //   } else if (hour < 12) {
-  //     console.log("tabela 2", hour + 1, hourSequence[index]);
-  //   } else if (hour < 18) {
-  //     console.log("tabela 3", hour + 1, hourSequence[index]);
-  //   } else {
-  //     console.log("tabela 4", hour + 1, hourSequence[index]);
-  //   }
-  // }
+  const dayHourDuration = (sunSet - sunRise) / 12;
+  const nightHourDuration = (sunRiseNext - sunSet) / 12;
+  return [dayHourDuration, nightHourDuration];
 }
+
+// const hourSequence = hourSequenceOfDay[planetOfDay[dayOfWeek]];
+// for (let hour = 0; hour < 24; hour++) {
+//   let index = hour % 7;
+//   if (hour < 6) {
+//     console.log("tabela 1", hour + 1, hourSequence[index]);
+//   } else if (hour < 12) {
+//     console.log("tabela 2", hour + 1, hourSequence[index]);
+//   } else if (hour < 18) {
+//     console.log("tabela 3", hour + 1, hourSequence[index]);
+//   } else {
+//     console.log("tabela 4", hour + 1, hourSequence[index]);
+//   }
+// }
 
 function newDate(dateStr) {
   getAllAsyncStuff(dateStrToObj(dateStr));
