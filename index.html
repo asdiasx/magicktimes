@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible"
+        content="IE=edge">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+  <title>Magick-Times</title>
+</head>
+
+<body>
+  <script src="./script.js"
+          defer></script>
+  <h1>Magic Times</h1>
+
+  <div class="container">
+    <p>You are located at: <span id="city"></span></p>
+    <form action="">
+      <label for="date">Select a date:</label>
+      <input type="date"
+             name="date"
+             id="date"
+             onchange="newDate(this.value)"
+             placeholder="yyyy-mm-dd">
+    </form>
+    <p>Planet of day: <span id="planet"></span></p>
+  </div>
+
+  <h2>Time Tables</h2>
+  <div class="tab">
+    <button class="tablinks"
+            onclick="openTab(event,'dayHours')">Day hours</button>
+    <button class="tablinks"
+            onclick="openTab(event,'nightHours')">Night hours</button>
+  </div>
+  <div class="tabcontent"
+       id="dayHours">
+    tabela dia
+    <table id="onetosix">
+      <thead>
+        <tr>
+          <th id="number">#</th>
+          <th id="hour">Hour</th>
+          <th id="planet">Planet</th>
+          <th id="sym">Sym</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th id="one">1</th>
+          <td headers="hour one"></td>
+          <td headers="planet one"></td>
+          <td headers="sym one"></td>
+        </tr>
+        <tr>
+          <th id="two">2</th>
+          <td headers="hour two"></td>
+          <td headers="planet two"></td>
+          <td headers="sym two"></td>
+        </tr>
+        <tr>
+          <th id="three">3</th>
+          <td headers="hour three"></td>
+          <td headers="planet three"></td>
+          <td headers="sym three"></td>
+        </tr>
+        <tr>
+          <th id="four">4</th>
+          <td headers="hour four"></td>
+          <td headers="planet four"></td>
+          <td headers="sym four"></td>
+        </tr>
+        <tr>
+          <th id="five">5</th>
+          <td headers="hour five"></td>
+          <td headers="planet five"></td>
+          <td headers="sym five"></td>
+        </tr>
+        <tr>
+          <th id="six">6</th>
+          <td headers="hour six"></td>
+          <td headers="planet six"></td>
+          <td headers="sym six"></td>
+        </tr>
+      </tbody>
+    </table>
+    <table id="seventotwelve">
+      <thead>
+        <tr>
+          <th id="number">#</th>
+          <th id="hour">Hour</th>
+          <th id="planet">Planet</th>
+          <th id="sym">Sym</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th id="seven">7</th>
+          <td headers="hour seven"></td>
+          <td headers="planet seven"></td>
+          <td headers="sym seven"></td>
+        </tr>
+        <tr>
+          <th id="eight">8</th>
+          <td headers="hour eight"></td>
+          <td headers="planet eight"></td>
+          <td headers="sym eight"></td>
+        </tr>
+        <tr>
+          <th id="nine">9</th>
+          <td headers="hour nine"></td>
+          <td headers="planet nine"></td>
+          <td headers="sym nine"></td>
+        </tr>
+        <tr>
+          <th id="ten">10</th>
+          <td headers="hour ten"></td>
+          <td headers="planet ten"></td>
+          <td headers="sym ten"></td>
+        </tr>
+        <tr>
+          <th id="eleven">11</th>
+          <td headers="hour eleven"></td>
+          <td headers="planet eleven"></td>
+          <td headers="sym eleven"></td>
+        </tr>
+        <tr>
+          <th id="twelve">12</th>
+          <td headers="hour twelve"></td>
+          <td headers="planet twelve"></td>
+          <td headers="sym twelve"></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div class="tabcontent"
+       id="NightHours">
+    tabela noite
+    <table id="thirteentoeighteen">
+      <thead>
+        <tr>
+          <th id="number">#</th>
+          <th id="hour">Hour</th>
+          <th id="planet">Planet</th>
+          <th id="sym">Sym</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th id="thirteen">13</th>
+          <td headers="hour thirteen"></td>
+          <td headers="planet thirteen"></td>
+          <td headers="sym thirteen"></td>
+        </tr>
+        <tr>
+          <th id="twentyeenteenteen">14</th>
+          <td headers="hour twentyeenteenteen"></td>
+          <td headers="planet twentyeenteenteen"></td>
+          <td headers="sym twentyeenteenteen"></td>
+        </tr>
+        <tr>
+          <th id="fifteen">15</th>
+          <td headers="hour fifteen"></td>
+          <td headers="planet fifteen"></td>
+          <td headers="sym fifteen"></td>
+        </tr>
+        <tr>
+          <th id="twentyeenteen">16</th>
+          <td headers="hour twentyeenteen"></td>
+          <td headers="planet twentyeenteen"></td>
+          <td headers="sym twentyeenteen"></td>
+        </tr>
+        <tr>
+          <th id="twentyoneteenteen">17</th>
+          <td headers="hour twentyoneteenteen"></td>
+          <td headers="planet twentyoneteenteen"></td>
+          <td headers="sym twentyoneteenteen"></td>
+        </tr>
+        <tr>
+          <th id="twentyeen">18</th>
+          <td headers="hour twentyeen"></td>
+          <td headers="planet twentyeen"></td>
+          <td headers="sym twentyeen"></td>
+        </tr>
+      </tbody>
+    </table>
+    <table id="twentyoneteentotwentytwentyeenteen">
+      <thead>
+        <tr>
+          <th id="number">#</th>
+          <th id="hour">Hour</th>
+          <th id="planet">Planet</th>
+          <th id="sym">Sym</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th id="twentyoneteen">19</th>
+          <td headers="hour twentyoneteen"></td>
+          <td headers="planet twentyoneteen"></td>
+          <td headers="sym twentyoneteen"></td>
+        </tr>
+        <tr>
+          <th id="twenty">20</th>
+          <td headers="hour twenty"></td>
+          <td headers="planet twenty"></td>
+          <td headers="sym twenty"></td>
+        </tr>
+        <tr>
+          <th id="twentyone">21</th>
+          <td headers="hour twentyone"></td>
+          <td headers="planet twentyone"></td>
+          <td headers="sym twentyone"></td>
+        </tr>
+        <tr>
+          <th id="twentytwo">22</th>
+          <td headers="hour twentytwo"></td>
+          <td headers="planet twentytwo"></td>
+          <td headers="sym twentytwo"></td>
+        </tr>
+        <tr>
+          <th id="twentythree">23</th>
+          <td headers="hour twentythree"></td>
+          <td headers="planet twentythree"></td>
+          <td headers="sym twentythree"></td>
+        </tr>
+        <tr>
+          <th id="twentyfour">24</th>
+          <td headers="hour twentyfour"></td>
+          <td headers="planet twentyfour"></td>
+          <td headers="sym twentyfour"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <a href="https://sunrise-sunset.org/api">* Data provided by sunrise-sunset.org/api</a>
+</body>
+
+</html>
