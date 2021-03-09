@@ -20,7 +20,7 @@ const hourSequenceOfDay = {
   Saturn: ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"],
 };
 
-const fieldCity = document.getElementById("city");
+const fieldTown = document.getElementById("town");
 const fieldPlanet = document.getElementById("planet");
 const fieldDate = document.getElementById("date");
 
@@ -28,14 +28,15 @@ let date = new Date();
 fieldDate.value = dateObjToStr(date);
 
 getAllAsyncStuff(date);
+document.getElementById("defaultOpen").click();
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // sart of async stuff
 async function getAllAsyncStuff(date) {
   const [lat, lng] = await getCoords();
 
-  const city = await getCity(lat, lng);
-  fieldCity.innerHTML = city;
+  const town = await getTown(lat, lng);
+  fieldTown.innerHTML = town;
 
   const planet = calculatePlanetOfDay(date);
   fieldPlanet.innerHTML = planet;
@@ -79,13 +80,13 @@ function getLocationFromBrowser() {
   return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, options));
 }
 
-async function getCity(lat, lng) {
+async function getTown(lat, lng) {
   const TKN = "pk.5af2e80a21ef4a01e99b93d01a25dcc1";
   const url = `https://us1.locationiq.com/v1/reverse.php?key=${TKN}&lat=${lat}&lon=${lng}&format=json`;
   const response = await fetch(url);
   const locationData = await response.json();
-  const city = locationData.address.town;
-  return city;
+  const town = locationData.address.town;
+  return town;
 }
 
 async function getSunHours(lat, lng, date) {
@@ -135,29 +136,15 @@ function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHour
   for (let hour = 0; hour < 24; hour++) {
     let index = hour % 7;
 
-    if (hour < 6) {
-      table = "table1";
+    if (hour < 12) {
+      table = "tableDay";
       hourNumber = hour + 1;
       planet = hourSequence[index];
       symbol = symbols[planet];
       initHour = timeFromMiliSec(sunRise + hour * dayHourDuration);
       endHour = timeFromMiliSec(sunRise + hour * dayHourDuration + (dayHourDuration - 60000));
-    } else if (hour < 12) {
-      table = "table2";
-      hourNumber = hour + 1;
-      planet = hourSequence[index];
-      symbol = symbols[planet];
-      initHour = timeFromMiliSec(sunRise + hour * dayHourDuration);
-      endHour = timeFromMiliSec(sunRise + hour * dayHourDuration + (dayHourDuration - 60000));
-    } else if (hour < 18) {
-      table = "table3";
-      hourNumber = (hour % 12) + 1;
-      planet = hourSequence[index];
-      symbol = symbols[planet];
-      initHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration);
-      endHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration + (nightHourDuration - 60000));
     } else {
-      table = "table4";
+      table = "tableNight";
       hourNumber = (hour % 12) + 1;
       planet = hourSequence[index];
       symbol = symbols[planet];
@@ -176,6 +163,7 @@ function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHour
     tableDataSym.innerHTML = symbol;
     tableDataEnd.innerHTML = endHour;
     tableDataHour.classList.add("bold");
+    tableDataSym.classList.add("bold");
     tableRow.appendChild(tableDataHour);
     tableRow.appendChild(tableDataInit);
     tableRow.appendChild(tableDataPlanet);
@@ -193,4 +181,25 @@ function timeFromMiliSec(miliSeconds) {
 
 function newDate(dateStr) {
   getAllAsyncStuff(dateStrToObj(dateStr));
+}
+
+function openTab(evt, tabName) {
+  // Declare all variables
+  let i, tabcontent, tablinks;
+
+  // Get all elements with class="tabcontent" and hide them
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].style.display = "none";
+  }
+
+  // Get all elements with class="tablinks" and remove the class "active"
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
+  // Show the current tab, and add an "active" class to the button that opened the tab
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
 }

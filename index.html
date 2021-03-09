@@ -21,7 +21,8 @@
   <h1>Magic Times</h1>
 
   <div class="container">
-    <p>You are located at: <span id="city"></span></p>
+    <p>You are located at: <span id="town"></span></p>
+
     <form action="">
       <label for="date">Select a date:</label>
       <input type="date"
@@ -33,17 +34,18 @@
     <p>Planet of day: <span id="planet"></span></p>
   </div>
 
-  <h2>Time Tables</h2>
   <div class="tab">
     <button class="tablinks"
+            id="defaultOpen"
             onclick="openTab(event,'dayHours')">Day hours</button>
+  </div>
+  <div class="tab">
     <button class="tablinks"
             onclick="openTab(event,'nightHours')">Night hours</button>
   </div>
   <div class="tabcontent"
        id="dayHours">
-    tabela dia
-    <table id="onetosix">
+    <table>
       <thead>
         <tr>
           <th id="hour">Hour#</th>
@@ -53,27 +55,13 @@
           <th id="end">End</th>
         </tr>
       </thead>
-      <tbody id="table1">
-      </tbody>
-    </table>
-    <table id="seventotwelve">
-      <thead>
-        <tr>
-          <th id="hour">Hour#</th>
-          <th id="init">Init</th>
-          <th id="planet">Planet</th>
-          <th id="sym">Sym</th>
-          <th id="end">End</th>
-        </tr>
-      </thead>
-      <tbody id="table2">
+      <tbody id="tableDay">
       </tbody>
     </table>
   </div>
   <div class="tabcontent"
-       id="NightHours">
-    tabela noite
-    <table id="thirteentoeighteen">
+       id="nightHours">
+    <table>
       <thead>
         <tr>
           <th id="hour">Hour#</th>
@@ -83,20 +71,7 @@
           <th id="end">End</th>
         </tr>
       </thead>
-      <tbody id="table3">
-      </tbody>
-    </table>
-    <table id="twentyoneteentotwentytwentyeenteen">
-      <thead>
-        <tr>
-          <th id="hour">Hour#</th>
-          <th id="init">Init</th>
-          <th id="planet">Planet</th>
-          <th id="sym">Sym</th>
-          <th id="end">End</th>
-        </tr>
-      </thead>
-      <tbody id="table4">
+      <tbody id="tableNight">
       </tbody>
     </table>
   </div>
