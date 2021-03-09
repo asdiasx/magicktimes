@@ -1,0 +1,37 @@
+* {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+body {
+  background-color: #f1f1f1;
+  font-family: "Open Sans", sans-serif;
+  margin: 1em;
+}
+ul,
+ol,
+li {
+  list-style: none;
+}
+
+table {
+  width: 90%;
+  border-collapse: collapse;
+  border: 0.2em solid black;
+  margin: 1em auto;
+}
+
+th,
+td {
+  height: 2em;
+  border: 0.1em solid black;
+  text-align: center;
+}
+
+.bold {
+  font-weight: bold;
+}
+
+h1 {
+  text-align: center;
+}
