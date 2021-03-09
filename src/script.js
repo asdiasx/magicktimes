@@ -1,13 +1,13 @@
 const planetOfDays = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 
 const symbols = {
-  Sun: "&#9737;",
-  Moon: "&#9790;",
-  Mars: "&#9794;",
-  Mercury: "&#9791;",
-  Jupiter: "&#9795;",
-  Venus: "&#9792;",
-  Saturn: "&#9796;",
+  Sun: "<img class='svg' src='./src/img/Sol.svg'></img>",
+  Moon: "<img class='svg' src='./src/img/Lua.svg'></img>",
+  Mars: "<img class='svg' src='./src/img/Marte.svg'></img>",
+  Mercury: "<img class='svg' src='./src/img/Mercurio.svg'></img>",
+  Jupiter: "<img class='svg' src='./src/img/Jupiter.svg'></img>",
+  Venus: "<img class='svg' src='./src/img/Venus.svg'></img>",
+  Saturn: "<img class='svg' src='./src/img/Saturno.svg'></img>",
 };
 
 const hourSequenceOfDay = {
@@ -85,8 +85,19 @@ async function getTown(lat, lng) {
   const url = `https://us1.locationiq.com/v1/reverse.php?key=${TKN}&lat=${lat}&lon=${lng}&format=json`;
   const response = await fetch(url);
   const locationData = await response.json();
+  const suburb = locationData.address.suburb;
   const town = locationData.address.town;
-  return town;
+  const city = locationData.address.city;
+  const state = locationData.address.state;
+  if (city != undefined) {
+    return city;
+  } else if (town != undefined) {
+    return town;
+  } else if (state != undefined) {
+    return state;
+  } else {
+    return "location error";
+  }
 }
 
 async function getSunHours(lat, lng, date) {
@@ -124,8 +135,6 @@ function calculateHoursOfDay(sunRise, sunSet, sunRiseNext) {
 }
 
 function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHourDuration, hourSequence) {
-  console.log(`${new Date(sunRise)} \n${new Date(sunSet)} \n${new Date(sunRiseNext)}`);
-
   let table, hourNumber, planet, symbol, initHour, endHour, tableRow;
 
   const tableContents = document.getElementsByTagName("tbody");
@@ -174,8 +183,10 @@ function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHour
 }
 
 function timeFromMiliSec(miliSeconds) {
-  date = new Date(miliSeconds);
-  time = `${date.getHours()}:${date.getMinutes()}`;
+  const date = new Date(miliSeconds);
+  const hours = String(date.getHours());
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  time = `${hours}:${minutes}`;
   return time;
 }
 
