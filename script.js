@@ -1,5 +1,14 @@
-const offset = new Date().getTimezoneOffset() * 60 * 1000;
 const planetOfDays = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
+
+const symbols = {
+  Sun: "&#9737;",
+  Moon: "&#9790;",
+  Mars: "&#9794;",
+  Mercury: "&#9791;",
+  Jupiter: "&#9795;",
+  Venus: "&#9792;",
+  Saturn: "&#9796;",
+};
 
 const hourSequenceOfDay = {
   Sun: ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"],
@@ -10,6 +19,7 @@ const hourSequenceOfDay = {
   Venus: ["Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun"],
   Saturn: ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"],
 };
+
 const fieldCity = document.getElementById("city");
 const fieldPlanet = document.getElementById("planet");
 const fieldDate = document.getElementById("date");
@@ -19,6 +29,7 @@ fieldDate.value = dateObjToStr(date);
 
 getAllAsyncStuff(date);
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 // sart of async stuff
 async function getAllAsyncStuff(date) {
   const [lat, lng] = await getCoords();
@@ -32,8 +43,11 @@ async function getAllAsyncStuff(date) {
   const [sunRise, sunSet, sunRiseNext] = await getSunHours(lat, lng, date);
   const [dayHourDuration, nightHourDuration] = calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
 
-  console.log(dayHourDuration, nightHourDuration);
-} //end of async stuff
+  const hourSequence = hourSequenceOfDay[planet];
+  populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHourDuration, hourSequence);
+}
+//end of async stuff
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // functions definitions
 function dateObjToStr(dateObj) {
@@ -70,7 +84,7 @@ async function getCity(lat, lng) {
   const url = `https://us1.locationiq.com/v1/reverse.php?key=${TKN}&lat=${lat}&lon=${lng}&format=json`;
   const response = await fetch(url);
   const locationData = await response.json();
-  const city = locationData.address.city;
+  const city = locationData.address.town;
   return city;
 }
 
@@ -108,19 +122,74 @@ function calculateHoursOfDay(sunRise, sunSet, sunRiseNext) {
   return [dayHourDuration, nightHourDuration];
 }
 
-// const hourSequence = hourSequenceOfDay[planetOfDay[dayOfWeek]];
-// for (let hour = 0; hour < 24; hour++) {
-//   let index = hour % 7;
-//   if (hour < 6) {
-//     console.log("tabela 1", hour + 1, hourSequence[index]);
-//   } else if (hour < 12) {
-//     console.log("tabela 2", hour + 1, hourSequence[index]);
-//   } else if (hour < 18) {
-//     console.log("tabela 3", hour + 1, hourSequence[index]);
-//   } else {
-//     console.log("tabela 4", hour + 1, hourSequence[index]);
-//   }
-// }
+function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHourDuration, hourSequence) {
+  console.log(`${new Date(sunRise)} \n${new Date(sunSet)} \n${new Date(sunRiseNext)}`);
+
+  let table, hourNumber, planet, symbol, initHour, endHour, tableRow;
+
+  const tableContents = document.getElementsByTagName("tbody");
+  for (let tbl = 0; tbl < tableContents.length; tbl++) {
+    tableContents[tbl].innerHTML = "";
+  }
+
+  for (let hour = 0; hour < 24; hour++) {
+    let index = hour % 7;
+
+    if (hour < 6) {
+      table = "table1";
+      hourNumber = hour + 1;
+      planet = hourSequence[index];
+      symbol = symbols[planet];
+      initHour = timeFromMiliSec(sunRise + hour * dayHourDuration);
+      endHour = timeFromMiliSec(sunRise + hour * dayHourDuration + (dayHourDuration - 60000));
+    } else if (hour < 12) {
+      table = "table2";
+      hourNumber = hour + 1;
+      planet = hourSequence[index];
+      symbol = symbols[planet];
+      initHour = timeFromMiliSec(sunRise + hour * dayHourDuration);
+      endHour = timeFromMiliSec(sunRise + hour * dayHourDuration + (dayHourDuration - 60000));
+    } else if (hour < 18) {
+      table = "table3";
+      hourNumber = (hour % 12) + 1;
+      planet = hourSequence[index];
+      symbol = symbols[planet];
+      initHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration);
+      endHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration + (nightHourDuration - 60000));
+    } else {
+      table = "table4";
+      hourNumber = (hour % 12) + 1;
+      planet = hourSequence[index];
+      symbol = symbols[planet];
+      initHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration);
+      endHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration + (nightHourDuration - 60000));
+    }
+    let tableRow = document.createElement("tr");
+    let tableDataHour = document.createElement("td");
+    let tableDataInit = document.createElement("td");
+    let tableDataPlanet = document.createElement("td");
+    let tableDataSym = document.createElement("td");
+    let tableDataEnd = document.createElement("td");
+    tableDataHour.innerHTML = hourNumber;
+    tableDataInit.innerHTML = initHour;
+    tableDataPlanet.innerHTML = planet;
+    tableDataSym.innerHTML = symbol;
+    tableDataEnd.innerHTML = endHour;
+    tableDataHour.classList.add("bold");
+    tableRow.appendChild(tableDataHour);
+    tableRow.appendChild(tableDataInit);
+    tableRow.appendChild(tableDataPlanet);
+    tableRow.appendChild(tableDataSym);
+    tableRow.appendChild(tableDataEnd);
+    document.getElementById(table).appendChild(tableRow);
+  }
+}
+
+function timeFromMiliSec(miliSeconds) {
+  date = new Date(miliSeconds);
+  time = `${date.getHours()}:${date.getMinutes()}`;
+  return time;
+}
 
 function newDate(dateStr) {
   getAllAsyncStuff(dateStrToObj(dateStr));
