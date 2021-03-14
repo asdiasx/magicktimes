@@ -81,7 +81,7 @@ function getLocationFromBrowser() {
 }
 
 async function getTown(lat, lng) {
-  const TKN = "pk.5af2e80a21ef4a01e99b93d01a25dcc1";
+  const TKN = "pk.477b428ec8c1457679a304cf002e632c";
   const url = `https://us1.locationiq.com/v1/reverse.php?key=${TKN}&lat=${lat}&lon=${lng}&format=json`;
   const response = await fetch(url);
   const locationData = await response.json();
