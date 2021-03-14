@@ -160,10 +160,12 @@ td {
   display: block;
   text-align: right;
   margin-right: 5%;
-  margin-bottom: 0.5em;
   text-decoration: none;
   color: var(--darkColor);
   font-size: 0.6em;
+}
+.credit[:last-of-type] {
+  margin-bottom: 0.5em;
 }
 .credit_art {
   display: block;
