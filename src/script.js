@@ -33,19 +33,20 @@ document.getElementById("defaultOpen").click();
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // sart of async stuff
 async function getAllAsyncStuff(date) {
-  const [lat, lng] = await getCoords();
-
-  const town = await getTown(lat, lng);
-  fieldTown.innerHTML = town;
-
   const planet = calculatePlanetOfDay(date);
   fieldPlanet.innerHTML = planet;
+
+  const [lat, lng] = await getCoords();
+
+  const town = getTown(lat, lng);
 
   const [sunRise, sunSet, sunRiseNext] = await getSunHours(lat, lng, date);
   const [dayHourDuration, nightHourDuration] = calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
 
+  fieldTown.innerHTML = await town;
+
   const hourSequence = hourSequenceOfDay[planet];
-  populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHourDuration, hourSequence);
+  populateTables(sunRise, sunSet, dayHourDuration, nightHourDuration, hourSequence);
 }
 //end of async stuff
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,9 +103,9 @@ async function getTown(lat, lng) {
 
 async function getSunHours(lat, lng, date) {
   let sunRise, sunSet, sunRiseNext;
-  let dateObjNext = new Date();
+  let dateObjNext = new Date(date);
   dateObjNext.setDate(date.getDate() + 1);
-  dateAndNext = [dateObjToStr(date), dateObjToStr(dateObjNext)];
+  let dateAndNext = [dateObjToStr(date), dateObjToStr(dateObjNext)];
 
   for (let day = 0; day < 2; day++) {
     let dateUrl = dateAndNext[day];
@@ -118,7 +119,6 @@ async function getSunHours(lat, lng, date) {
       sunSet = Date.parse(sunData.results.sunset);
     }
   }
-
   return [sunRise, sunSet, sunRiseNext];
 }
 
@@ -134,8 +134,8 @@ function calculateHoursOfDay(sunRise, sunSet, sunRiseNext) {
   return [dayHourDuration, nightHourDuration];
 }
 
-function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHourDuration, hourSequence) {
-  let table, hourNumber, planet, symbol, initHour, endHour, tableRow;
+function populateTables(sunRise, sunSet, dayHourDuration, nightHourDuration, hourSequence) {
+  let table, hourNumber, planet, symbol, initHour, endHour;
 
   const tableContents = document.getElementsByTagName("tbody");
   for (let tbl = 0; tbl < tableContents.length; tbl++) {
@@ -161,32 +161,28 @@ function populateTables(sunRise, sunSet, sunRiseNext, dayHourDuration, nightHour
       endHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration + (nightHourDuration - 60000));
     }
     let tableRow = document.createElement("tr");
-    let tableDataHour = document.createElement("td");
-    let tableDataInit = document.createElement("td");
-    let tableDataPlanet = document.createElement("td");
-    let tableDataSym = document.createElement("td");
-    let tableDataEnd = document.createElement("td");
-    tableDataHour.innerHTML = hourNumber;
-    tableDataInit.innerHTML = initHour;
-    tableDataPlanet.innerHTML = planet;
-    tableDataSym.innerHTML = symbol;
-    tableDataEnd.innerHTML = endHour;
-    tableDataHour.classList.add("bold");
-    tableDataSym.classList.add("bold");
-    tableRow.appendChild(tableDataHour);
-    tableRow.appendChild(tableDataInit);
-    tableRow.appendChild(tableDataPlanet);
-    tableRow.appendChild(tableDataSym);
-    tableRow.appendChild(tableDataEnd);
+
+    createRowElement(tableRow, hourNumber, "bold");
+    createRowElement(tableRow, initHour, null);
+    createRowElement(tableRow, planet, null);
+    createRowElement(tableRow, symbol, "bold");
+    createRowElement(tableRow, endHour, null);
+
     document.getElementById(table).appendChild(tableRow);
   }
+}
+function createRowElement(tableRow, elementContent, elementClass) {
+  tableCell = document.createElement("td");
+  tableCell.innerHTML = elementContent;
+  tableCell.classList.add(elementClass);
+  tableRow.appendChild(tableCell);
 }
 
 function timeFromMiliSec(miliSeconds) {
   const date = new Date(miliSeconds);
   const hours = String(date.getHours());
   const minutes = String(date.getMinutes()).padStart(2, "0");
-  time = `${hours}:${minutes}`;
+  const time = `${hours}:${minutes}`;
   return time;
 }
 
@@ -194,7 +190,7 @@ function newDate(dateStr) {
   getAllAsyncStuff(dateStrToObj(dateStr));
 }
 
-function openTab(evt, tabName) {
+function openTab(event, tabName) {
   let i, tabcontent, tablinks;
 
   tablinks = document.getElementsByClassName("tablinks");
@@ -205,5 +201,5 @@ function openTab(evt, tabName) {
   }
 
   document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
+  event.currentTarget.className += " active";
 }
