@@ -1,0 +1,14 @@
+{
+  "name": "magicktimes",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "make",
+    "clean": "make clean"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.3",
+    "html-minifier-terser": "^7.2.0",
+    "terser": "^5.31.0"
+  }
+}

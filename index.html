@@ -3,99 +3,77 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible"
-        content="IE=edge">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet"
-        href="./src/style.css">
-  <link rel="icon"
-        type="image/png"
-        href="./src/img/magick_times_favico.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./src/style.css">
+  <link rel="icon" type="image/png" href="./src/img/magick_times_favico.png" />
   <title>Magick-Times</title>
 </head>
 
 <body>
-  <script src="./src/script.js"
-          defer></script>
   <div id="wrapper">
-    <img id="logo"
-         src="./src/img/magick_times.svg"
-         alt="logo magick times" />
+    <img id="logo" src="./src/img/magick_times.svg" alt="Magick Times logo" />
   </div>
   <div class="container">
     <p>You are located at: <span id="town"></span></p>
-
-    <form action="">
+    <div class="date-picker">
       <label for="date">Select a date:</label>
-      <input type="date"
-             name="date"
-             id="date"
-             onchange="newDate(this.value)"
-             placeholder="yyyy-mm-dd">
-    </form>
+      <input type="date" name="date" id="date" placeholder="yyyy-mm-dd">
+    </div>
     <p>Planet of day: <span id="planet"></span></p>
+    <p id="status" class="status" aria-live="polite"></p>
   </div>
 
-  <div class="tab">
-    <button class="tablinks"
-            id="defaultOpen"
-            onclick="openTab(event,'dayHours')">Day hours</button>
+  <div role="tablist" class="tablist">
+    <div class="tab">
+      <button class="tablinks" id="defaultOpen"
+              role="tab" aria-selected="true" aria-controls="dayHours">Day hours</button>
+    </div>
+    <div class="tab">
+      <button class="tablinks"
+              role="tab" aria-selected="false" aria-controls="nightHours">Night hours</button>
+    </div>
   </div>
-  <div class="tab">
-    <button class="tablinks"
-            onclick="openTab(event,'nightHours')">Night hours</button>
-  </div>
-  <div class="tabcontent"
-       id="dayHours">
+
+  <div class="tabcontent" id="dayHours" role="tabpanel">
     <table>
       <thead>
         <tr>
-          <th id="hour">Hour#</th>
-          <th id="init">Init</th>
-          <th id="planet">Planet</th>
-          <th id="sym">Sym</th>
-          <th id="end">End</th>
+          <th scope="col">Hour#</th>
+          <th scope="col">Init</th>
+          <th scope="col">Planet</th>
+          <th scope="col">Sym</th>
+          <th scope="col">End</th>
         </tr>
       </thead>
-      <tbody id="tableDay">
-      </tbody>
+      <tbody id="tableDay"></tbody>
     </table>
-    <a class="credit"
-       target="_blank"
-       href="https://sunrise-sunset.org/api">* Data provided by sunrise-sunset.org/api</a>
-    <a class="credit"
-       target="_blank"
-       href='https://locationiq.com'>Search by LocationIQ.com</a>
   </div>
-  <div class="tabcontent"
-       id="nightHours">
+  <div class="tabcontent" id="nightHours" role="tabpanel">
     <table>
       <thead>
         <tr>
-          <th id="hour">Hour#</th>
-          <th id="init">Init</th>
-          <th id="planet">Planet</th>
-          <th id="sym">Sym</th>
-          <th id="end">End</th>
+          <th scope="col">Hour#</th>
+          <th scope="col">Init</th>
+          <th scope="col">Planet</th>
+          <th scope="col">Sym</th>
+          <th scope="col">End</th>
         </tr>
       </thead>
-      <tbody id="tableNight">
-      </tbody>
+      <tbody id="tableNight"></tbody>
     </table>
-    <a class="credit"
-       target="_blank"
-       href="https://sunrise-sunset.org/api">* Data provided by sunrise-sunset.org/api</a>
-    <a class="credit"
-       target="_blank"
-       href='https://locationiq.com'>Search by LocationIQ.com</a>
   </div>
-  <a class="credit_art"
-     target="_blank"
-     href="https://instagram.com/matheusrocha.design?igshid=18cfs965rehgri">Logo Art by <spam class="lnk">
-      @matheusrocha.design
-    </spam></a>
 
+  <footer class="credits">
+    <a class="credit" target="_blank" rel="noopener noreferrer"
+       href="https://sunrise-sunset.org/api">* Data provided by sunrise-sunset.org/api</a>
+    <a class="credit" target="_blank" rel="noopener noreferrer"
+       href="https://locationiq.com">Search by LocationIQ.com</a>
+    <a class="credit_art" target="_blank" rel="noopener noreferrer"
+       href="https://instagram.com/matheusrocha.design?igshid=18cfs965rehgri">Logo Art by <span class="lnk">@matheusrocha.design</span></a>
+    <a class="credit_art" href="mailto:adriano.rj.br@gmail.com">Developed by Adriano Dias</a>
+  </footer>
+
+  <script src="./src/script.js"></script>
 </body>
 
 </html>

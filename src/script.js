@@ -1,205 +1,217 @@
+// ⚠ API key is public in source — rotate it and restrict it on the LocationIQ dashboard
+const LOCATIONIQ_KEY = "pk.477b428ec8c1457679a304cf002e632c";
+const HOUR_DISPLAY_GAP_MS = 60_000;
+
 const planetOfDays = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 
 const symbols = {
-  Sun: "<img class='svg' src='./src/img/Sol.svg'></img>",
-  Moon: "<img class='svg' src='./src/img/Lua.svg'></img>",
-  Mars: "<img class='svg' src='./src/img/Marte.svg'></img>",
-  Mercury: "<img class='svg' src='./src/img/Mercurio.svg'></img>",
-  Jupiter: "<img class='svg' src='./src/img/Jupiter.svg'></img>",
-  Venus: "<img class='svg' src='./src/img/Venus.svg'></img>",
-  Saturn: "<img class='svg' src='./src/img/Saturno.svg'></img>",
+  Sun:     "<img class='svg' src='./src/img/Sol.svg' alt='Sun'>",
+  Moon:    "<img class='svg' src='./src/img/Lua.svg' alt='Moon'>",
+  Mars:    "<img class='svg' src='./src/img/Marte.svg' alt='Mars'>",
+  Mercury: "<img class='svg' src='./src/img/Mercurio.svg' alt='Mercury'>",
+  Jupiter: "<img class='svg' src='./src/img/Jupiter.svg' alt='Jupiter'>",
+  Venus:   "<img class='svg' src='./src/img/Venus.svg' alt='Venus'>",
+  Saturn:  "<img class='svg' src='./src/img/Saturno.svg' alt='Saturn'>",
 };
 
 const hourSequenceOfDay = {
-  Sun: ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"],
-  Moon: ["Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury"],
-  Mars: ["Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter"],
+  Sun:     ["Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars"],
+  Moon:    ["Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury"],
+  Mars:    ["Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn", "Jupiter"],
   Mercury: ["Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun", "Venus"],
   Jupiter: ["Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon", "Saturn"],
-  Venus: ["Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun"],
-  Saturn: ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"],
+  Venus:   ["Venus", "Mercury", "Moon", "Saturn", "Jupiter", "Mars", "Sun"],
+  Saturn:  ["Saturn", "Jupiter", "Mars", "Sun", "Venus", "Mercury", "Moon"],
 };
 
-const fieldTown = document.getElementById("town");
+const fieldTown   = document.getElementById("town");
 const fieldPlanet = document.getElementById("planet");
-const fieldDate = document.getElementById("date");
+const fieldDate   = document.getElementById("date");
+const fieldStatus = document.getElementById("status");
 
-let date = new Date();
-fieldDate.value = dateObjToStr(date);
+let currentRequestId = 0;
 
-getAllAsyncStuff(date);
+fieldDate.value = dateObjToStr(new Date());
+fieldDate.addEventListener("change", (e) => getAllAsyncStuff(dateStrToObj(e.target.value)));
+
+document.querySelectorAll(".tablinks").forEach((btn) =>
+  btn.addEventListener("click", (e) => openTab(e, btn.getAttribute("aria-controls")))
+);
 document.getElementById("defaultOpen").click();
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// sart of async stuff
+getAllAsyncStuff(new Date());
+
+// ─── async orchestration ─────────────────────────────────────────────────────
+
 async function getAllAsyncStuff(date) {
-  const planet = calculatePlanetOfDay(date);
-  fieldPlanet.innerHTML = planet;
+  const requestId = ++currentRequestId;
 
-  const [lat, lng] = await getCoords();
+  setStatus("Detecting location…");
 
-  const town = getTown(lat, lng);
+  let lat, lng;
+  try {
+    [lat, lng] = await getCoords();
+  } catch {
+    setStatus("Location access denied. Please allow location permission and reload.", true);
+    return;
+  }
 
-  const [sunRise, sunSet, sunRiseNext] = await getSunHours(lat, lng, date);
-  const [dayHourDuration, nightHourDuration] = calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
+  if (requestId !== currentRequestId) return;
 
-  fieldTown.innerHTML = await town;
+  setStatus("Loading planetary hours…");
 
-  const hourSequence = hourSequenceOfDay[planet];
-  populateTables(sunRise, sunSet, dayHourDuration, nightHourDuration, hourSequence);
+  try {
+    const planet = calculatePlanetOfDay(date);
+    const [[sunRise, sunSet, sunRiseNext], town] = await Promise.all([
+      getSunHours(lat, lng, date),
+      getTown(lat, lng),
+    ]);
+
+    if (requestId !== currentRequestId) return;
+
+    fieldPlanet.textContent = planet;
+    fieldTown.textContent   = town;
+
+    const [dayDuration, nightDuration] = calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
+    populateTables(sunRise, sunSet, dayDuration, nightDuration, hourSequenceOfDay[planet]);
+    setStatus("");
+  } catch {
+    if (requestId !== currentRequestId) return;
+    setStatus("Failed to load planetary hours. Check your connection and try again.", true);
+  }
 }
-//end of async stuff
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// functions definitions
-function dateObjToStr(dateObj) {
-  const dd = String(dateObj.getDate()).padStart(2, "0");
-  const mm = String(dateObj.getMonth() + 1).padStart(2, "0"); //January is 0!
-  const yyyy = dateObj.getFullYear();
-  const dateStr = yyyy + "-" + mm + "-" + dd;
-  return dateStr;
-}
+// ─── API helpers ─────────────────────────────────────────────────────────────
 
-function dateStrToObj(dateStr) {
-  const dateObj = new Date(dateStr + "T00:00");
-  return dateObj;
+function getLocationFromBrowser() {
+  return new Promise((resolve, reject) =>
+    navigator.geolocation.getCurrentPosition(resolve, reject, {
+      enableHighAccuracy: true,
+      timeout: 5000,
+      maximumAge: 0,
+    })
+  );
 }
 
 async function getCoords() {
   const pos = await getLocationFromBrowser();
-  const lat = pos.coords.latitude.toString();
-  const lng = pos.coords.longitude.toString();
-  return [lat, lng];
-}
-
-function getLocationFromBrowser() {
-  const options = {
-    enableHighAccuracy: true,
-    timeout: 5000,
-    maximumAge: 0,
-  };
-  return new Promise((resolve, reject) => navigator.geolocation.getCurrentPosition(resolve, reject, options));
+  return [pos.coords.latitude.toString(), pos.coords.longitude.toString()];
 }
 
 async function getTown(lat, lng) {
-  const TKN = "pk.477b428ec8c1457679a304cf002e632c";
-  const url = `https://us1.locationiq.com/v1/reverse.php?key=${TKN}&lat=${lat}&lon=${lng}&format=json`;
+  const url = `https://us1.locationiq.com/v1/reverse.php?key=${LOCATIONIQ_KEY}&lat=${lat}&lon=${lng}&format=json`;
   const response = await fetch(url);
-  const locationData = await response.json();
-  const suburb = locationData.address.suburb;
-  const town = locationData.address.town;
-  const city = locationData.address.city;
-  const state = locationData.address.state;
-  if (city != undefined) {
-    return city;
-  } else if (town != undefined) {
-    return town;
-  } else if (state != undefined) {
-    return state;
-  } else {
-    return "location error";
-  }
+  const { address } = await response.json();
+  return address.city ?? address.town ?? address.state ?? "Unknown location";
 }
 
 async function getSunHours(lat, lng, date) {
-  let sunRise, sunSet, sunRiseNext;
-  let dateObjNext = new Date(date);
-  dateObjNext.setDate(date.getDate() + 1);
-  let dateAndNext = [dateObjToStr(date), dateObjToStr(dateObjNext)];
+  const today    = dateObjToStr(date);
+  const tomorrow = dateObjToStr(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1));
 
-  for (let day = 0; day < 2; day++) {
-    let dateUrl = dateAndNext[day];
-    let url = `https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${dateUrl}&formatted=0`;
-    const response = await fetch(url);
-    const sunData = await response.json();
-    if (day == 1) {
-      sunRiseNext = Date.parse(sunData.results.sunrise);
-    } else {
-      sunRise = Date.parse(sunData.results.sunrise);
-      sunSet = Date.parse(sunData.results.sunset);
-    }
-  }
-  return [sunRise, sunSet, sunRiseNext];
+  const fetchDay = (d) =>
+    fetch(`https://api.sunrise-sunset.org/json?lat=${lat}&lng=${lng}&date=${d}&formatted=0`)
+      .then((r) => r.json());
+
+  const [todayData, tomorrowData] = await Promise.all([fetchDay(today), fetchDay(tomorrow)]);
+
+  return [
+    Date.parse(todayData.results.sunrise),
+    Date.parse(todayData.results.sunset),
+    Date.parse(tomorrowData.results.sunrise),
+  ];
 }
 
+// ─── calculations ────────────────────────────────────────────────────────────
+
 function calculatePlanetOfDay(date) {
-  const dayOfWeek = date.getDay();
-  const planet = planetOfDays[dayOfWeek];
-  return planet;
+  return planetOfDays[date.getDay()];
 }
 
 function calculateHoursOfDay(sunRise, sunSet, sunRiseNext) {
-  const dayHourDuration = (sunSet - sunRise) / 12;
-  const nightHourDuration = (sunRiseNext - sunSet) / 12;
-  return [dayHourDuration, nightHourDuration];
+  return [(sunSet - sunRise) / 12, (sunRiseNext - sunSet) / 12];
 }
 
-function populateTables(sunRise, sunSet, dayHourDuration, nightHourDuration, hourSequence) {
-  let table, hourNumber, planet, symbol, initHour, endHour;
+// ─── DOM rendering ───────────────────────────────────────────────────────────
 
-  const tableContents = document.getElementsByTagName("tbody");
-  for (let tbl = 0; tbl < tableContents.length; tbl++) {
-    tableContents[tbl].innerHTML = "";
-  }
+function populateTables(sunRise, sunSet, dayDuration, nightDuration, hourSequence) {
+  const dayFrag   = document.createDocumentFragment();
+  const nightFrag = document.createDocumentFragment();
+  const now = Date.now();
+  let currentIsNight = false;
 
   for (let hour = 0; hour < 24; hour++) {
-    let index = hour % 7;
+    const isDay    = hour < 12;
+    const planet   = hourSequence[hour % 7];
+    const hourNum  = isDay ? hour + 1 : (hour % 12) + 1;
+    const base     = isDay ? sunRise + hour * dayDuration : sunSet + (hour % 12) * nightDuration;
+    const duration = isDay ? dayDuration : nightDuration;
 
-    if (hour < 12) {
-      table = "tableDay";
-      hourNumber = hour + 1;
-      planet = hourSequence[index];
-      symbol = symbols[planet];
-      initHour = timeFromMiliSec(sunRise + hour * dayHourDuration);
-      endHour = timeFromMiliSec(sunRise + hour * dayHourDuration + (dayHourDuration - 60000));
-    } else {
-      table = "tableNight";
-      hourNumber = (hour % 12) + 1;
-      planet = hourSequence[index];
-      symbol = symbols[planet];
-      initHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration);
-      endHour = timeFromMiliSec(sunSet + (hour % 12) * nightHourDuration + (nightHourDuration - 60000));
-    }
-    let tableRow = document.createElement("tr");
+    const isCurrent = now >= base && now < base + duration;
+    if (isCurrent && !isDay) currentIsNight = true;
 
-    createRowElement(tableRow, hourNumber, "bold");
-    createRowElement(tableRow, initHour, null);
-    createRowElement(tableRow, planet, null);
-    createRowElement(tableRow, symbol, "bold");
-    createRowElement(tableRow, endHour, null);
+    const row = buildRow(hourNum, timeFromMs(base), planet, symbols[planet], timeFromMs(base + duration - HOUR_DISPLAY_GAP_MS), isCurrent);
+    (isDay ? dayFrag : nightFrag).appendChild(row);
+  }
 
-    document.getElementById(table).appendChild(tableRow);
+  const tableDay   = document.getElementById("tableDay");
+  const tableNight = document.getElementById("tableNight");
+  tableDay.innerHTML   = "";
+  tableNight.innerHTML = "";
+  tableDay.appendChild(dayFrag);
+  tableNight.appendChild(nightFrag);
+
+  if (currentIsNight) {
+    document.querySelector('.tablinks[aria-controls="nightHours"]').click();
   }
 }
-function createRowElement(tableRow, elementContent, elementClass) {
-  tableCell = document.createElement("td");
-  tableCell.innerHTML = elementContent;
-  tableCell.classList.add(elementClass);
-  tableRow.appendChild(tableCell);
+
+function buildRow(hourNum, initTime, planet, symbol, endTime, isCurrent = false) {
+  const row = document.createElement("tr");
+  if (isCurrent) row.classList.add("current-hour");
+  appendCell(row, hourNum, "bold");
+  appendCell(row, initTime);
+  appendCell(row, planet, isCurrent ? "current-planet" : null);
+  appendCell(row, symbol, isCurrent ? "bold current-planet" : "bold", true);
+  appendCell(row, endTime);
+  return row;
 }
 
-function timeFromMiliSec(miliSeconds) {
-  const date = new Date(miliSeconds);
-  const hours = String(date.getHours());
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  const time = `${hours}:${minutes}`;
-  return time;
+function appendCell(row, content, className, isHtml = false) {
+  const td = document.createElement("td");
+  if (isHtml) td.innerHTML = content;
+  else td.textContent = content;
+  if (className) className.split(" ").forEach((c) => td.classList.add(c));
+  row.appendChild(td);
 }
 
-function newDate(dateStr) {
-  getAllAsyncStuff(dateStrToObj(dateStr));
+function timeFromMs(ms) {
+  const d = new Date(ms);
+  return `${d.getHours()}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+function setStatus(message, isError = false) {
+  fieldStatus.textContent = message;
+  fieldStatus.className   = "status" + (isError ? " status--error" : "");
+}
+
+// ─── UI interaction ──────────────────────────────────────────────────────────
+
+function dateObjToStr(date) {
+  return date.toLocaleDateString("en-CA");
+}
+
+function dateStrToObj(dateStr) {
+  return new Date(dateStr + "T00:00");
 }
 
 function openTab(event, tabName) {
-  let i, tabcontent, tablinks;
-
-  tablinks = document.getElementsByClassName("tablinks");
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tablinks.length; i++) {
-    tabcontent[i].style.display = "none";
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-
+  document.querySelectorAll(".tabcontent").forEach((el) => (el.style.display = "none"));
+  document.querySelectorAll(".tablinks").forEach((btn) => {
+    btn.classList.remove("active");
+    btn.setAttribute("aria-selected", "false");
+  });
   document.getElementById(tabName).style.display = "block";
-  event.currentTarget.className += " active";
+  event.currentTarget.classList.add("active");
+  event.currentTarget.setAttribute("aria-selected", "true");
 }

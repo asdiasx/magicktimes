@@ -53,6 +53,10 @@ label {
   margin: 1em 0;
 }
 
+.date-picker {
+  margin: 1em 0;
+}
+
 input {
   padding: 0.2em;
   border-radius: 0.5em;
@@ -65,20 +69,37 @@ input {
   font-weight: bold;
 }
 
+.status {
+  font-size: 1em;
+  margin: 0.5em 0;
+  min-height: 1.4em;
+  color: var(--darkColor);
+  font-style: italic;
+}
+
+.status--error {
+  color: #c0392b;
+  font-style: normal;
+  font-weight: bold;
+}
+
 .svg {
-  width: 2vh;
+  width: 1.5rem;
+  padding: 0.2em;
 }
 
 .bold {
   font-weight: bold;
 }
 
+.tablist {
+  display: flex;
+}
+
 .tab {
-  /* position: relative; */
   display: inline-block;
   border-radius: 0.5em 0.5em 0 0;
   overflow: hidden;
-  /* border: 1px solid var(--mediumColor); */
   border-bottom: none;
   background-color: var(--lightColor);
 }
@@ -89,7 +110,6 @@ input {
   font-size: 1.2em;
   font-weight: bold;
   float: left;
-  /* border: none; */
   outline: none;
   cursor: pointer;
   padding: 0.3em 0.5em;
@@ -153,17 +173,33 @@ td {
   text-align: center;
 }
 
+tr.current-hour td {
+  background-color: var(--mediumColor);
+  color: var(--darkColor);
+  font-weight: bold;
+}
+
+td.current-planet {
+  background-color: #a9a9d0;
+}
+
+.credits {
+  margin-top: 0.5em;
+}
+
 .credit {
   display: block;
   text-align: right;
   margin-right: 5%;
   text-decoration: none;
-  color: var(--darkColor);
-  font-size: 0.6em;
+  color: var(--lightColor);
+  font-size: 0.75em;
 }
-.credit[:last-of-type] {
+
+.credit:last-of-type {
   margin-bottom: 0.5em;
 }
+
 .credit_art {
   display: block;
   text-align: center;
@@ -172,6 +208,36 @@ td {
   color: var(--lightColor);
   font-size: 1em;
 }
+
 .lnk {
   text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  body {
+    width: 100%;
+    margin: 0;
+  }
+
+  #logo {
+    width: 95%;
+  }
+
+  .container {
+    border-radius: 0;
+  }
+
+  table {
+    width: 100%;
+    font-size: 0.85em;
+  }
+
+  .tabcontent {
+    border-radius: 0 0.5em 0.5em 0.5em;
+    padding: 4px 6px;
+  }
+
+  input {
+    font-size: 1em;
+  }
 }
