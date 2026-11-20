@@ -1,76 +1,125 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Horas Planetárias de Hoje — Calculadora | Magick Times</title>
+  <meta name="description" content="Descubra qual planeta rege cada hora de hoje na sua cidade. Calculadora gratuita de horas planetárias diurnas e noturnas, a partir do nascer e do pôr do sol.">
+  <link rel="canonical" href="https://magicktimes.com.br/">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#8c4e9f">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="Magick Times">
+  <meta property="og:url" content="https://magicktimes.com.br/">
+  <meta property="og:title" content="Horas Planetárias de Hoje — Magick Times">
+  <meta property="og:description" content="Qual planeta rege cada hora de hoje na sua cidade? Calculadora gratuita de horas planetárias.">
+  <meta property="og:image" content="https://magicktimes.com.br/src/img/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Magick Times — Horas Planetárias",
+    "url": "https://magicktimes.com.br/",
+    "description": "Calculadora gratuita das horas planetárias do dia, diurnas e noturnas, com base no nascer e no pôr do sol da sua localização.",
+    "inLanguage": "pt-BR",
+    "applicationCategory": "LifestyleApplication",
+    "operatingSystem": "Qualquer (navegador)",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "BRL" },
+    "author": { "@type": "Person", "name": "Adriano Dias" }
+  }
+  </script>
+
   <link rel="stylesheet" href="./src/style.css">
   <link rel="icon" type="image/png" href="./src/img/magick_times_favico.png" />
-  <title>Magick-Times</title>
 </head>
 
 <body>
-  <div id="wrapper">
-    <img id="logo" src="./src/img/magick_times.svg" alt="Magick Times logo" />
-  </div>
-  <div class="container">
-    <p>You are located at: <span id="town"></span></p>
-    <div class="date-picker">
-      <label for="date">Select a date:</label>
-      <input type="date" name="date" id="date" placeholder="yyyy-mm-dd">
-    </div>
-    <p>Planet of day: <span id="planet"></span></p>
-    <p id="status" class="status" aria-live="polite"></p>
-  </div>
+  <header id="wrapper">
+    <img id="logo" src="./src/img/magick_times.svg" alt="Magick Times" />
+  </header>
 
-  <div role="tablist" class="tablist">
-    <div class="tab">
-      <button class="tablinks" id="defaultOpen"
-              role="tab" aria-selected="true" aria-controls="dayHours">Day hours</button>
+  <main>
+    <div class="container">
+      <h1 class="title">Horas planetárias de hoje</h1>
+      <p>Você está em: <span id="town"></span></p>
+      <div class="date-picker">
+        <label for="date">Escolha uma data:</label>
+        <input type="date" name="date" id="date" placeholder="aaaa-mm-dd">
+      </div>
+      <p>Planeta do dia: <span id="planet"></span></p>
+      <p id="status" class="status" aria-live="polite"></p>
     </div>
-    <div class="tab">
-      <button class="tablinks"
-              role="tab" aria-selected="false" aria-controls="nightHours">Night hours</button>
-    </div>
-  </div>
 
-  <div class="tabcontent" id="dayHours" role="tabpanel">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Hour#</th>
-          <th scope="col">Init</th>
-          <th scope="col">Planet</th>
-          <th scope="col">Sym</th>
-          <th scope="col">End</th>
-        </tr>
-      </thead>
-      <tbody id="tableDay"></tbody>
-    </table>
-  </div>
-  <div class="tabcontent" id="nightHours" role="tabpanel">
-    <table>
-      <thead>
-        <tr>
-          <th scope="col">Hour#</th>
-          <th scope="col">Init</th>
-          <th scope="col">Planet</th>
-          <th scope="col">Sym</th>
-          <th scope="col">End</th>
-        </tr>
-      </thead>
-      <tbody id="tableNight"></tbody>
-    </table>
-  </div>
+    <div role="tablist" class="tablist">
+      <div class="tab">
+        <button class="tablinks" id="defaultOpen"
+                role="tab" aria-selected="true" aria-controls="dayHours">Horas do dia</button>
+      </div>
+      <div class="tab">
+        <button class="tablinks"
+                role="tab" aria-selected="false" aria-controls="nightHours">Horas da noite</button>
+      </div>
+    </div>
+
+    <div class="tabcontent" id="dayHours" role="tabpanel">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Hora</th>
+            <th scope="col">Início</th>
+            <th scope="col">Planeta</th>
+            <th scope="col">Símbolo</th>
+            <th scope="col">Fim</th>
+          </tr>
+        </thead>
+        <tbody id="tableDay"></tbody>
+      </table>
+    </div>
+    <div class="tabcontent" id="nightHours" role="tabpanel">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Hora</th>
+            <th scope="col">Início</th>
+            <th scope="col">Planeta</th>
+            <th scope="col">Símbolo</th>
+            <th scope="col">Fim</th>
+          </tr>
+        </thead>
+        <tbody id="tableNight"></tbody>
+      </table>
+    </div>
+
+    <article class="container about">
+      <h2>O que são horas planetárias?</h2>
+      <p>Na tradição astrológica, cada hora do dia é regida por um dos sete planetas clássicos: Sol, Lua, Marte, Mercúrio, Júpiter, Vênus e Saturno. As horas planetárias são usadas na astrologia eletiva, na magia natural e em outras práticas esotéricas para escolher o momento mais favorável para cada atividade.</p>
+
+      <h2>Como as horas planetárias são calculadas</h2>
+      <ul class="list">
+        <li>O dia é dividido em <strong>12 horas diurnas</strong>, do nascer ao pôr do sol, e <strong>12 horas noturnas</strong>, do pôr do sol ao nascer seguinte. Por isso uma hora planetária quase nunca tem 60 minutos: a duração muda com a estação do ano e com o lugar.</li>
+        <li>A primeira hora começa no nascer do sol e é regida pelo <strong>planeta do dia da semana</strong>: domingo, Sol; segunda, Lua; terça, Marte; quarta, Mercúrio; quinta, Júpiter; sexta, Vênus; sábado, Saturno.</li>
+        <li>As horas seguintes seguem a <strong>ordem caldaica</strong>: Saturno, Júpiter, Marte, Sol, Vênus, Mercúrio e Lua, recomeçando do início.</li>
+      </ul>
+
+      <h2>Como usar o Magick Times</h2>
+      <p>Permita o acesso à sua localização: o site busca o horário do nascer e do pôr do sol da sua cidade, calcula as 24 horas planetárias e destaca a hora atual. Para consultar outro dia, escolha a data no calendário.</p>
+    </article>
+  </main>
 
   <footer class="credits">
     <a class="credit" target="_blank" rel="noopener noreferrer"
-       href="https://sunrise-sunset.org/api">* Data provided by sunrise-sunset.org/api</a>
+       href="https://sunrise-sunset.org/api">* Dados de nascer e pôr do sol: sunrise-sunset.org/api</a>
     <a class="credit" target="_blank" rel="noopener noreferrer"
-       href="https://locationiq.com">Search by LocationIQ.com</a>
+       href="https://locationiq.com">Localização por LocationIQ.com</a>
     <a class="credit_art" target="_blank" rel="noopener noreferrer"
-       href="https://instagram.com/matheusrocha.design?igshid=18cfs965rehgri">Logo Art by <span class="lnk">@matheusrocha.design</span></a>
-    <a class="credit_art" href="mailto:adriano.rj.br@gmail.com">Developed by Adriano Dias</a>
+       href="https://instagram.com/matheusrocha.design?igshid=18cfs965rehgri">Arte do logo: <span class="lnk">@matheusrocha.design</span></a>
+    <a class="credit_art" href="mailto:adriano.rj.br@gmail.com">Desenvolvido por Adriano Dias</a>
   </footer>
 
   <script src="./src/script.js"></script>

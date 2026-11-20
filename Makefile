@@ -18,6 +18,8 @@ JS_OUT   := $(DIST)/$(SRC)/script.js
 CSS_OUT  := $(DIST)/$(SRC)/style.css
 HTML_OUT := $(DIST)/index.html
 IMG_OUT  := $(DIST)/$(SRC)/img
+SEO_SRC  := robots.txt sitemap.xml
+SEO_OUT  := $(addprefix $(DIST)/,$(SEO_SRC))
 
 # Derived from DEPLOY_TARGET (user@host:/path)
 _DEPLOY_HOST = $(firstword $(subst :, ,$(DEPLOY_TARGET)))
@@ -28,7 +30,7 @@ _BACKUP_PATH = $(_DEPLOY_PATH).bak
 
 all: build
 
-build: $(JS_OUT) $(CSS_OUT) $(HTML_OUT) $(IMG_OUT)
+build: $(JS_OUT) $(CSS_OUT) $(HTML_OUT) $(IMG_OUT) $(SEO_OUT)
 
 deploy: build
 	@test -n "$(DEPLOY_TARGET)" || (echo "Error: DEPLOY_TARGET not set. Example: make deploy DEPLOY_TARGET=user@host:/path" && exit 1)
@@ -69,6 +71,15 @@ $(HTML_OUT): $(HTML_SRC) | node_modules
 $(IMG_OUT): $(IMGS)
 	@mkdir -p $@
 	cp -r $(SRC)/img/. $@
+
+# Arquivos para buscadores (copiados sem alteração)
+$(DIST)/robots.txt: robots.txt
+	@mkdir -p $(DIST)
+	cp $< $@
+
+$(DIST)/sitemap.xml: sitemap.xml
+	@mkdir -p $(DIST)
+	cp $< $@
 
 clean:
 	rm -rf $(DIST)

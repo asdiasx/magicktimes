@@ -213,6 +213,33 @@ td.current-planet {
   text-decoration: underline;
 }
 
+/* SEO: título e texto explicativo visíveis (2026-11-20) */
+.title {
+  font-size: 1.4em;
+  margin: 0.3em 0 0.6em;
+  color: var(--darkColor);
+}
+
+.about {
+  margin-top: 2em;
+  line-height: 1.6;
+}
+
+.about h2 {
+  font-size: 1.15em;
+  margin: 1em 0 0.4em;
+  color: var(--darkColor);
+}
+
+.about p {
+  margin-bottom: 0.6em;
+}
+
+.about .list li {
+  list-style: disc;
+  margin: 0 0 0.5em 1.2em;
+}
+
 @media (max-width: 480px) {
   body {
     width: 100%;

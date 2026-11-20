@@ -4,14 +4,20 @@ const HOUR_DISPLAY_GAP_MS = 60_000;
 
 const planetOfDays = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
 
+// Nomes exibidos (pt-BR). As chaves internas continuam em inglês.
+const planetNames = {
+  Sun: "Sol", Moon: "Lua", Mars: "Marte", Mercury: "Mercúrio",
+  Jupiter: "Júpiter", Venus: "Vênus", Saturn: "Saturno",
+};
+
 const symbols = {
-  Sun:     "<img class='svg' src='./src/img/Sol.svg' alt='Sun'>",
-  Moon:    "<img class='svg' src='./src/img/Lua.svg' alt='Moon'>",
-  Mars:    "<img class='svg' src='./src/img/Marte.svg' alt='Mars'>",
-  Mercury: "<img class='svg' src='./src/img/Mercurio.svg' alt='Mercury'>",
-  Jupiter: "<img class='svg' src='./src/img/Jupiter.svg' alt='Jupiter'>",
-  Venus:   "<img class='svg' src='./src/img/Venus.svg' alt='Venus'>",
-  Saturn:  "<img class='svg' src='./src/img/Saturno.svg' alt='Saturn'>",
+  Sun:     "<img class='svg' src='./src/img/Sol.svg' alt='Sol'>",
+  Moon:    "<img class='svg' src='./src/img/Lua.svg' alt='Lua'>",
+  Mars:    "<img class='svg' src='./src/img/Marte.svg' alt='Marte'>",
+  Mercury: "<img class='svg' src='./src/img/Mercurio.svg' alt='Mercúrio'>",
+  Jupiter: "<img class='svg' src='./src/img/Jupiter.svg' alt='Júpiter'>",
+  Venus:   "<img class='svg' src='./src/img/Venus.svg' alt='Vênus'>",
+  Saturn:  "<img class='svg' src='./src/img/Saturno.svg' alt='Saturno'>",
 };
 
 const hourSequenceOfDay = {
@@ -46,19 +52,19 @@ getAllAsyncStuff(new Date());
 async function getAllAsyncStuff(date) {
   const requestId = ++currentRequestId;
 
-  setStatus("Detecting location…");
+  setStatus("Detectando sua localização…");
 
   let lat, lng;
   try {
     [lat, lng] = await getCoords();
   } catch {
-    setStatus("Location access denied. Please allow location permission and reload.", true);
+    setStatus("Acesso à localização negado. Permita a localização no navegador e recarregue a página.", true);
     return;
   }
 
   if (requestId !== currentRequestId) return;
 
-  setStatus("Loading planetary hours…");
+  setStatus("Calculando as horas planetárias…");
 
   try {
     const planet = calculatePlanetOfDay(date);
@@ -69,7 +75,7 @@ async function getAllAsyncStuff(date) {
 
     if (requestId !== currentRequestId) return;
 
-    fieldPlanet.textContent = planet;
+    fieldPlanet.textContent = planetNames[planet];
     fieldTown.textContent   = town;
 
     const [dayDuration, nightDuration] = calculateHoursOfDay(sunRise, sunSet, sunRiseNext);
@@ -77,7 +83,7 @@ async function getAllAsyncStuff(date) {
     setStatus("");
   } catch {
     if (requestId !== currentRequestId) return;
-    setStatus("Failed to load planetary hours. Check your connection and try again.", true);
+    setStatus("Não foi possível calcular as horas planetárias. Verifique sua conexão e tente novamente.", true);
   }
 }
 
@@ -99,10 +105,10 @@ async function getCoords() {
 }
 
 async function getTown(lat, lng) {
-  const url = `https://us1.locationiq.com/v1/reverse.php?key=${LOCATIONIQ_KEY}&lat=${lat}&lon=${lng}&format=json`;
+  const url = `https://us1.locationiq.com/v1/reverse.php?key=${LOCATIONIQ_KEY}&lat=${lat}&lon=${lng}&format=json&accept-language=pt-BR`;
   const response = await fetch(url);
   const { address } = await response.json();
-  return address.city ?? address.town ?? address.state ?? "Unknown location";
+  return address.city ?? address.town ?? address.state ?? "Local desconhecido";
 }
 
 async function getSunHours(lat, lng, date) {
@@ -150,7 +156,7 @@ function populateTables(sunRise, sunSet, dayDuration, nightDuration, hourSequenc
     const isCurrent = now >= base && now < base + duration;
     if (isCurrent && !isDay) currentIsNight = true;
 
-    const row = buildRow(hourNum, timeFromMs(base), planet, symbols[planet], timeFromMs(base + duration - HOUR_DISPLAY_GAP_MS), isCurrent);
+    const row = buildRow(hourNum, timeFromMs(base), planetNames[planet], symbols[planet], timeFromMs(base + duration - HOUR_DISPLAY_GAP_MS), isCurrent);
     (isDay ? dayFrag : nightFrag).appendChild(row);
   }
 
