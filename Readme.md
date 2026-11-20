@@ -2,7 +2,7 @@
 
 A planetary hours calculator. Given your location and a date, it shows which planet rules each of the 24 unequal hours of that day, divided into day hours (sunrise → sunset) and night hours (sunset → next sunrise).
 
-**Live site:** [magicktimes.com](https://www.magicktimes.com/)
+**Live site:** [magicktimes.com.br](https://magicktimes.com.br/) (`magicktimes.com` and `www.` variants redirect here)
 
 ---
 
@@ -40,7 +40,7 @@ The LocationIQ key is hardcoded in [src/script.js](src/script.js). Since this is
 
 1. Log in to [locationiq.com](https://locationiq.com)
 2. Go to **API Access Tokens**
-3. Edit your token → set **Allowed HTTP Referrers** to your domain (e.g. `https://www.magicktimes.com/*`)
+3. Create a token with **Allowed HTTP Referrers** set to the site domains: `https://magicktimes.com.br/*` (main) and `https://www.magicktimes.com/*`. The LocationIQ dashboard may not allow editing referrers on an existing token, so to change domains, create a new token, swap it in `src/script.js`, deploy, then delete the old token.
 
 ### Running locally
 
@@ -108,10 +108,21 @@ server {
 `DEPLOY_TARGET` can also be passed inline without a `.env`:
 
 ```bash
-make deploy DEPLOY_TARGET=lempusr@67.207.94.161:/var/www/magicktimes/html/
+make deploy DEPLOY_TARGET=root@191.252.192.196:/var/www/magicktimes.com/html/
 ```
 
 ---
+
+### Hosting
+
+- **Server:** Locaweb VPS (Brazil, Debian 13). It was migrated from the old DigitalOcean droplet on 2026-11-20.
+- **Files:** served by nginx from `/var/www/magicktimes.com/html`.
+- **nginx vhosts:**
+  - `magicktimes-br` serves the main domain `magicktimes.com.br`; `www` redirects to the apex.
+  - `magicktimes` 301-redirects `magicktimes.com` and `www.magicktimes.com` to `https://magicktimes.com.br`.
+- **TLS:** Let's Encrypt certificates via certbot (nginx plugin), renewed automatically.
+- **DNS:** `magicktimes.com.br` at Registro.br; `magicktimes.com` at Umbler.
+- **Server operations:** see `~/Documents/projetos-e-infra/infraestrutura/operacao.md`.
 
 ## Project structure
 

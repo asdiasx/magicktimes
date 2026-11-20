@@ -1,5 +1,5 @@
 // ⚠ API key is public in source — rotate it and restrict it on the LocationIQ dashboard
-const LOCATIONIQ_KEY = "pk.477b428ec8c1457679a304cf002e632c";
+const LOCATIONIQ_KEY = "pk.87af3e484cd7098e3c3e7207385f3242";
 const HOUR_DISPLAY_GAP_MS = 60_000;
 
 const planetOfDays = ["Sun", "Moon", "Mars", "Mercury", "Jupiter", "Venus", "Saturn"];
